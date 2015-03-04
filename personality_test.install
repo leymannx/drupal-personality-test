@@ -27,19 +27,17 @@ function personality_test_uninstall() {
 }
 
 function add_custom_fields() {
-  foreach (_personality_test_installed_fields() as $field) {
-    field_create_field($field);
-  }
-  foreach (_personality_test_installed_instances() as $fieldinstance) {
-    $fieldinstance['entity_type'] = 'node';
-    $fieldinstance['bundle'] = 'personality_test';
-    field_create_instance($fieldinstance);
+  foreach (_personality_test_fields() as $field) {
+    field_create_field($field['field']);
+    $field['instance']['entity_type'] = 'node';
+    $field['instance']['bundle'] = 'personality_test';
+    field_create_instance($field['instance']);
   }
 }
  
 function delete_custom_fields() {
-  foreach (array_keys(_personality_test_installed_fields()) as $field) {
-    field_delete_field($field);
+  foreach (_personality_test_fields() as $field) {
+    field_delete_field($field['field']['field_name']);
   }
   $instances = field_info_instances('node', 'personality_test');
   foreach ($instances as $instance_name => $fieldinstance) {
@@ -47,68 +45,66 @@ function delete_custom_fields() {
   }
 }
 
-function _personality_test_installed_fields() {
+function _personality_test_fields() {
   $t = get_t();
   return array(
-    'personality_test_price' => array(
-      'field_name' => 'personality_test_price',
-      'label' => $t('Price of the Personality Test'),
-      'type' => 'text'
-    ),
-    'personality_test_quantity' => array(
-      'field_name' => 'personality_test_quantity',
-      'label' => $t('Quantity of the Personality Test'),
-      'type' => 'text'
-    ),
-    'personality_test_answers' => array(
-      'field_name' => 'personality_test_answers',
-      'label' => $t('Personality Test Answers'),
-      'type' => 'field_collection'
-    ),
-  );
-}
-
-function _personality_test_installed_instances() {
-  $t = get_t();
-  return array(
-    'personality_test_price' => array(
-      'field_name' => 'personality_test_price',
-      'type' => 'text',
-      'label' => $t('Price of the Personality Test'),
-      'widget' => array('type' => 'text_textfield'),
-      'display' => array(
-        'default' => array(
-          'label' => 'hidden', // hidden, inline, above
-          'type' => 'text_default' // text_default, text_plain, text_trimmed, hidden
+    array(
+      'field' => array(
+        'field_name' => 'personality_test_price',
+        'label' => $t('Price of the Personality Test'),
+        'type' => 'text'
+      ),
+      'instance' => array(
+        'field_name' => 'personality_test_price',
+        'type' => 'text',
+        'label' => $t('Price of the Personality Test'),
+        'widget' => array('type' => 'text_textfield'),
+        'required' => TRUE,
+        'display' => array(
+          'default' => array(
+            'label' => 'hidden', // hidden, inline, above
+            'type' => 'text_default' // text_default, text_plain, text_trimmed, hidden
+          )
         )
-      )
+      ),
     ),
-
-    'personality_test_quantity' => array(
-      'field_name' => 'personality_test_quantity',
-      'type' => 'text',
-      'label' => $t('Quantity of the Personality Test'),
-      'widget' => array('type' => 'text_textfield'),
-      'display' => array(
-        'default' => array(
-          'label' => 'hidden',
-          'type' => 'text_default'
+    array(
+      'field' => array(
+        'field_name' => 'personality_test_quantity',
+        'label' => $t('Quantity of the Personality Test'),
+        'type' => 'text',
+      ),
+      'instance' => array(
+        'field_name' => 'personality_test_quantity',
+        'type' => 'text',
+        'label' => $t('Quantity of the Personality Test'),
+        'widget' => array('type' => 'text_textfield'),
+        'display' => array(
+          'default' => array(
+            'label' => 'hidden',
+            'type' => 'text_default'
+          )
         )
-      )
+      ),
     ),
-
-    'personality_test_answers' => array(
-      'field_name' => 'personality_test_answers',
-      'type' => 'field_collection',
-      'label' => $t('Personality Test Answers'),
-      'widget' => array('type' => 'field_collection_embed'), // field_collection_hidden
-      'display' => array(
-        'default' => array(
-          'label' => 'hidden',
-          'type' => 'field_collection_fields' // field_collection_list, _view, _fields, hidden
+    array(
+      'field' => array(
+        'field_name' => 'personality_test_answers',
+        'label' => $t('Personality Test Answers'),
+        'type' => 'field_collection'
+      ),
+      'instance' => array(
+        'field_name' => 'personality_test_answers',
+        'type' => 'field_collection',
+        'label' => $t('Personality Test Answers'),
+        'widget' => array('type' => 'field_collection_embed'), // field_collection_hidden
+        'display' => array(
+          'default' => array(
+            'label' => 'hidden',
+            'type' => 'field_collection_fields' // field_collection_list, _view, _fields, hidden
+          )
         )
-      )
+      ),
     ),
-
   );
 }
