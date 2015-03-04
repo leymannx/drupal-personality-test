@@ -1,0 +1,23 @@
+<?php
+/**
+ * Implements hook_node_info()
+ */
+function personality_test_node_info() {
+  return array(
+    // machine_name
+    'personality_test' => array(
+      'name' => t('Personality Test'),
+      'base' => 'personality_test', // name of module
+      'description' => t('Create custom personality tests.'),
+      'has_title' => TRUE,
+      'title_label' => t('Title')
+    )
+  );
+}
+
+/**
+ * Implement hook_form()
+ */
+function personality_test_form($node, $form_state) {
+  return node_content_form($node, $form_state);
+}

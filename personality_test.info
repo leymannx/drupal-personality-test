@@ -1,0 +1,8 @@
+name = Personality Test
+description = Adds a new content type with custom fields for creating custom personality tests
+core = 7.x
+dependencies[] = field_collection
+files[] = personality_test.install
+files[] = personality_test.module
+
+; http://www.sitepoint.com/creating-a-new-drupal-node-type/
