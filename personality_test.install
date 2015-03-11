@@ -7,6 +7,16 @@ function personality_test_install() {
   $types = node_type_get_types();
   node_add_body_field($types['personality_test']);
   add_custom_fields();
+  // Default "Basic page" to not be promoted and have comments disabled.
+  variable_set('node_options_personality_test', array('status'));
+  variable_set('comment_personality_test', COMMENT_NODE_CLOSED);
+  // Don't display date and author information for "Basic page" nodes by default.
+  variable_set('node_submitted_personality_test', FALSE);
+  // Disable node preview
+  variable_set('node_preview_personality_test', 0);
+  // Disable menu entry
+  variable_set('menu_options_personality_test', array(0));
+  // more information: https://www.drupal.org/node/1169864
 }
 
 /**
@@ -28,38 +38,59 @@ function personality_test_uninstall() {
 
 function add_custom_fields() {
   foreach (_personality_test_fields() as $field) {
+    // at least field_name and type
     field_create_field($field['field']);
-    $field['instance']['entity_type'] = 'node';
-    $field['instance']['bundle'] = 'personality_test';
+    // at least field_name, entity_type and bundle
     field_create_instance($field['instance']);
   }
 }
  
 function delete_custom_fields() {
   foreach (_personality_test_fields() as $field) {
+    // field_name only
     field_delete_field($field['field']['field_name']);
-  }
-  $instances = field_info_instances('node', 'personality_test');
-  foreach ($instances as $instance_name => $fieldinstance) {
-    field_delete_instance($fieldinstance);
+    // at least field_name, entity_type and bundle
+    field_delete_instance($field['instance']);
   }
 }
 
 function _personality_test_fields() {
   $t = get_t();
   return array(
+    // Results
     array(
       'field' => array(
-        'field_name' => 'personality_test_price',
-        'label' => $t('Price of the Personality Test'),
-        'type' => 'text'
+        'field_name' => 'personality_test_results',
+        'label' => $t('Personality Test Results'),
+        'type' => 'field_collection'
       ),
       'instance' => array(
-        'field_name' => 'personality_test_price',
-        'type' => 'text',
-        'label' => $t('Price of the Personality Test'),
-        'widget' => array('type' => 'text_textfield'),
-        'required' => TRUE,
+        'field_name' => 'personality_test_results',
+        'entity_type' => 'node',
+        'bundle' => 'personality_test',
+        'label' => $t('Personality Test Results'),
+        'widget' => array('type' => 'field_collection_embed'), // field_collection_hidden
+        'display' => array(
+          'default' => array( // view mode
+            'label' => 'hidden',
+            'type' => 'field_collection_fields' // field_collection_list, _view, _fields, hidden
+          )
+        )
+      ),
+    ),
+    array(
+      'field' => array(
+        'field_name' => 'personality_test_result_a',
+        'label' => $t('Result A'),
+        'type' => 'text_long'
+      ),
+      'instance' => array(
+        'field_name' => 'personality_test_result_a',
+        'entity_type' => 'field_collection_item',
+        'bundle' => 'personality_test_results',
+        'label' => $t('Result A'),
+        'widget' => array('type' => 'text_textarea'),
+        // 'required' => TRUE,
         'display' => array(
           'default' => array(
             'label' => 'hidden', // hidden, inline, above
@@ -70,38 +101,152 @@ function _personality_test_fields() {
     ),
     array(
       'field' => array(
-        'field_name' => 'personality_test_quantity',
-        'label' => $t('Quantity of the Personality Test'),
-        'type' => 'text',
+        'field_name' => 'personality_test_result_b',
+        'label' => $t('Result B'),
+        'type' => 'text_long'
       ),
       'instance' => array(
-        'field_name' => 'personality_test_quantity',
-        'type' => 'text',
-        'label' => $t('Quantity of the Personality Test'),
-        'widget' => array('type' => 'text_textfield'),
+        'field_name' => 'personality_test_result_b',
+        'entity_type' => 'field_collection_item',
+        'bundle' => 'personality_test_results',
+        'label' => $t('Result B'),
+        'widget' => array('type' => 'text_textarea'),
+        // 'required' => TRUE,
         'display' => array(
           'default' => array(
-            'label' => 'hidden',
-            'type' => 'text_default'
+            'label' => 'hidden', // hidden, inline, above
+            'type' => 'text_default' // text_default, text_plain, text_trimmed, hidden
           )
         )
       ),
     ),
     array(
       'field' => array(
+        'field_name' => 'personality_test_result_c',
+        'label' => $t('Result C'),
+        'type' => 'text_long'
+      ),
+      'instance' => array(
+        'field_name' => 'personality_test_result_c',
+        'entity_type' => 'field_collection_item',
+        'bundle' => 'personality_test_results',
+        'label' => $t('Result C'),
+        'widget' => array('type' => 'text_textarea'),
+        // 'required' => TRUE,
+        'display' => array(
+          'default' => array(
+            'label' => 'hidden', // hidden, inline, above
+            'type' => 'text_default' // text_default, text_plain, text_trimmed, hidden
+          )
+        )
+      ),
+    ),
+    // Questions
+    array(
+      'field' => array(
+        'field_name' => 'personality_test_questions',
+        'label' => $t('Personality Test Questions'),
+        'cardinality' => FIELD_CARDINALITY_UNLIMITED,
+        'type' => 'field_collection'
+      ),
+      'instance' => array(
+        'field_name' => 'personality_test_questions',
+        'entity_type' => 'node',
+        'bundle' => 'personality_test',
+        'label' => $t('Personality Test Questions'),
+        'widget' => array('type' => 'field_collection_embed'), // field_collection_hidden
+        'display' => array(
+          'default' => array( // view mode
+            'label' => 'hidden',
+            'type' => 'field_collection_fields' // field_collection_list, _view, _fields, hidden
+          )
+        )
+      ),
+    ),
+    array(
+      'field' => array(
+        'field_name' => 'personality_test_question_body',
+        'label' => $t('Question'),
+        'type' => 'text_long'
+      ),
+      'instance' => array(
+        'field_name' => 'personality_test_question_body',
+        'entity_type' => 'field_collection_item',
+        'bundle' => 'personality_test_questions',
+        'label' => $t('Question'),
+        'widget' => array('type' => 'text_textarea'),
+        // 'required' => TRUE,
+        'display' => array(
+          'default' => array(
+            'label' => 'hidden', // hidden, inline, above
+            'type' => 'text_default' // text_default, text_plain, text_trimmed, hidden
+          )
+        )
+      ),
+    ),
+    // Answers
+    array(
+      'field' => array(
         'field_name' => 'personality_test_answers',
-        'label' => $t('Personality Test Answers'),
+        'label' => $t('Answers'),
+        'cardinality' => 3,
         'type' => 'field_collection'
       ),
       'instance' => array(
         'field_name' => 'personality_test_answers',
-        'type' => 'field_collection',
-        'label' => $t('Personality Test Answers'),
-        'widget' => array('type' => 'field_collection_embed'), // field_collection_hidden
+        'entity_type' => 'field_collection_item',
+        'bundle' => 'personality_test_questions',
+        'label' => $t('Answers'),
+        'widget' => array('type' => 'field_collection_embed'),
         'display' => array(
           'default' => array(
-            'label' => 'hidden',
-            'type' => 'field_collection_fields' // field_collection_list, _view, _fields, hidden
+            'label' => 'hidden', // hidden, inline, above
+            'type' => 'field_collecton_fields'
+          )
+        )
+      ),
+    ),
+    array(
+      'field' => array(
+        'field_name' => 'personality_test_answer_body',
+        'label' => $t('Answer'),
+        'type' => 'text_long'
+      ),
+      'instance' => array(
+        'field_name' => 'personality_test_answer_body',
+        'entity_type' => 'field_collection_item',
+        'bundle' => 'personality_test_answers',
+        'label' => $t('Answer'),
+        'widget' => array('type' => 'text_textarea'),
+        // 'required' => TRUE,
+        'display' => array(
+          'default' => array(
+            'label' => 'hidden', // hidden, inline, above
+            'type' => 'text_default' // text_default, text_plain, text_trimmed, hidden
+          )
+        )
+      ),
+    ),
+    array(
+      'field' => array(
+        'field_name' => 'personality_test_answer_map',
+        'label' => $t('Map to Result A, B or C'),
+        'type' => 'list_integer',
+        'settings' => array(
+          'allowed_values' => array('A', 'B', 'C'),
+        ),
+      ),
+      'instance' => array(
+        'field_name' => 'personality_test_answer_map',
+        'entity_type' => 'field_collection_item',
+        'bundle' => 'personality_test_answers',
+        'label' => $t('Map to Result A, B or C'),
+        'widget' => array('type' => 'options_select'),
+        // 'required' => TRUE,
+        'display' => array(
+          'default' => array(
+            'label' => 'hidden', // hidden, inline, above
+            'type' => 'list_default' // list_default, list_key, hidden
           )
         )
       ),
