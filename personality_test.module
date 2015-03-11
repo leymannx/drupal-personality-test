@@ -49,7 +49,6 @@ function personality_test($form, &$form_state, $node) {
     foreach ($entity[$item_id]->personality_test_answers[LANGUAGE_NONE] as $option) {
       $option_id = $option['value'];
       $option_entity = entity_load('field_collection_item', array($option_id));
-      dpm($option_entity);
       $answer = $option_entity[$option_id]->personality_test_answer_body[LANGUAGE_NONE][0]['value'];
       $key = $option_entity[$option_id]->personality_test_answer_map[LANGUAGE_NONE][0];
       array_push($options, $answer);
@@ -60,8 +59,6 @@ function personality_test($form, &$form_state, $node) {
       '#title' => $question,
       '#options' => $options
     );
-    dpm($question);
-    dpm($entity, 'ENTITY');
   }
 
   $form['submit_button'] = array(
@@ -69,7 +66,6 @@ function personality_test($form, &$form_state, $node) {
     '#value' => t('Submit'),
   );
   return $form;
-  dpm($form, 'FORM');
 }
 
 
