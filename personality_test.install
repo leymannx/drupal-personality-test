@@ -57,6 +57,31 @@ function delete_custom_fields() {
 function _personality_test_fields() {
   $t = get_t();
   return array(
+    // Image
+    array(
+      'field' => array(
+        'field_name' => 'personality_test_image',
+        'label' => $t('Image'),
+        'type' => 'image'
+      ),
+      'instance' => array(
+        'field_name' => 'personality_test_image',
+        'entity_type' => 'node',
+        'bundle' => 'personality_test',
+        'label' => $t('Image'),
+        'widget' => array('type' => 'image_image'),
+        'display' => array(
+          'default' => array( // view mode
+            'label' => 'hidden',
+            'type' => 'image'
+          ),
+          'result' => array( // view mode
+            'label' => 'hidden',
+            'type' => 'hidden'
+          ),
+        )
+      ),
+    ),
     // Results
     array(
       'field' => array(
