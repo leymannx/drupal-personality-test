@@ -71,10 +71,14 @@ function _personality_test_fields() {
         'label' => $t('Personality Test Results'),
         'widget' => array('type' => 'field_collection_embed'), // field_collection_hidden
         'display' => array(
-          'default' => array( // view mode
+          'default' => array( // view mode, hide on default but display on result
+            'label' => 'hidden',
+            'type' => 'hidden' // field_collection_list, _view, _fields, hidden
+          ),
+          'result' => array( // view mode
             'label' => 'hidden',
             'type' => 'field_collection_fields' // field_collection_list, _view, _fields, hidden
-          )
+          ),
         )
       ),
     ),
@@ -158,9 +162,13 @@ function _personality_test_fields() {
         'display' => array(
           'default' => array( // view mode
             'label' => 'hidden',
-            'type' => 'field_collection_fields' // field_collection_list, _view, _fields, hidden
+            'type' => 'hidden' // hide fields since we'll have a form instead
+          ),
+          'result' => array( // view mode
+            'label' => 'hidden',
+            'type' => 'hidden' // hide fields since we'll have a form instead
           )
-        )
+        ),
       ),
     ),
     array(
