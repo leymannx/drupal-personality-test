@@ -49,28 +49,63 @@ function personality_test_node_view($node, $view_mode, $langcode) {
     $form = drupal_get_form('personality_test', $node);
     $node->content['personality_test'] = array(
       '#markup' => drupal_render($form),
+      '#weight' => 2 // display before form
     );
   } elseif ($node->type == 'personality_test' && $view_mode == 'result') {
     $form = drupal_get_form('personality_test_reset_button');
     $node->content['reset_button'] = array(
       '#markup' => drupal_render($form),
-      '#weight' => 2 // display after result text
+      '#weight' => 10 // display after result text
     );
   }
+  // $results_field_id = $node->personality_test_results[LANGUAGE_NONE][0]['value'];
+  // $results = entity_load('field_collection_item', array($results_field_id));
+  // dpm($results, 'RESULTS');
+  // dpm($node, 'NODE');
 }
 
 /**
  * Implements hook_node_view() // to unset second title display in result view
  */
 function personality_test_preprocess_node(&$vars) {
-  // maybe do some more requests ...
+  // maybe ask for more conditions here
   if ($vars['elements']['#view_mode'] == 'result') {
     $vars['title'] = FALSE;
   }
 }
 
 /**
- * Our actual form
+ * Implements hook_preprocess_field() // to hide unwanted results from display
+ */
+function personality_test_preprocess_field(&$vars) {
+  // if($vars['element']['#field_name'] == "field_your_fc_field"){
+  //   $fcs = array();
+  //   foreach (element_children($vars['element']) as $key) {
+  //     $fcs[] = array_pop($vars['element'][$key]['entity']['field_collection_item']);
+  //   }
+  //   // now you have all your fcs pulled out of that nasty array
+  //   foreach ($fcs as $fc) {
+  //     # code... that 
+  //   }
+ 
+  //   // I would recommend overrideing items markup for whatever black magic you desire
+  //   $vars['items'] = array(
+  //     '#markup' => "Whatever you need to render",
+  //   );  
+  // }
+  // if (isset($vars['element']['#field_name'] = 'personality_test_results') && TRUE == TRUE) {
+
+  // }
+
+  // array_push($vars['classes_array'], 'action');
+
+  // unset($vars['items'][0]['entity']['field_collection_item'][86]['personality_test_result_a']);
+  // TO DO: match results display to score
+  dpm($vars);
+}
+
+/**
+ * Our actual form ...
  */
 function personality_test($form, &$form_state, $node) {
   // get field collection items from node
@@ -88,10 +123,37 @@ function personality_test($form, &$form_state, $node) {
   return $form;
 }
 
-function personality_test_submit($form, &$form_state) {
-  $_SESSION['quiz'] = 'test';
+function personality_test_validate($form, &$form_state) {
+  // dpm($form_state, 'FORM STATE');
+
+  $results = array();
+  if (isset($form_state['values'])) {
+    foreach ($form_state['values'] as $field => $value) {
+      if (preg_match('/question/', $field)) {
+        $value = intval($value);
+        $results[$field] = $value;
+      }
+    }
+  }
+  $number_of_questions = count($results);
+  $results_sum = array_sum($results);
+  $score = $results_sum / $number_of_questions;
+  dpm($results, 'RESULTS');
+  dpm($number_of_questions, 'NUMBER');
+  dpm($results_sum, 'SUM');
+  dpm($score, 'SCORE');
+
+  $_SESSION['quiz'] = $score;
 }
 
+function personality_test_submit($form, &$form_state) {
+
+  
+}
+
+/**
+ * ... and a reset button
+ */
 function personality_test_reset_button($form, &$form_state) {
   $form['reset_button'] = array(
     '#type' => 'submit',
@@ -121,7 +183,7 @@ function _personality_test_build_form($items) {
     // put everything together
     $elements['question_'.$index] = array(
       '#type' => 'radios',
-      '#title' => $question,
+      '#title' => $index . '. ' . $question,
       '#options' => $options
     );
   }
