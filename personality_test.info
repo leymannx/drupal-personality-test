@@ -1,6 +1,7 @@
 name = Personality Test
 description = Adds a new content type with custom fields for creating custom personality tests
 core = 7.x
+package = Custom
 dependencies[] = field_collection
 files[] = personality_test.install
 files[] = personality_test.module
