@@ -163,6 +163,10 @@ function personality_test_form_PERSONALITY_TEST_NODE_FORM_alter(&$form, $form_st
   $form['personality_test_results'][LANGUAGE_NONE][0]['personality_test_result_heading'][LANGUAGE_NONE][0]['value']['#description'] = t('Result A');
   $form['personality_test_results'][LANGUAGE_NONE][1]['personality_test_result_heading'][LANGUAGE_NONE][0]['value']['#description'] = t('Result B');
   $form['personality_test_results'][LANGUAGE_NONE][2]['personality_test_result_heading'][LANGUAGE_NONE][0]['value']['#description'] = t('Result C');
+  // adding js to adapt possible options to prior input
+  $form['#attached']['js'] = array(
+    drupal_get_path('module', 'personality_test') . '/scripts/options_adapt.js',
+  );
 }
 
 /**
