@@ -42,26 +42,29 @@ function personality_test_entity_view_mode_alter(&$view_mode, $context) {
 }
 
 /**
- * Implements hook_node_view() // to call our quiz form
+ * Implements hook_node_view() // to call our quiz form // and add radios sort script
  */
 function personality_test_node_view($node, $view_mode, $langcode) {
-  if ($node->type == 'personality_test' && $view_mode != 'result') {
-    $form = drupal_get_form('personality_test', $node);
-    $node->content['personality_test'] = array(
-      '#markup' => drupal_render($form),
-      '#weight' => 2 // display before form
-    );
-  } elseif ($node->type == 'personality_test' && $view_mode == 'result') {
-    $form = drupal_get_form('personality_test_reset_button');
-    $node->content['reset_button'] = array(
-      '#markup' => drupal_render($form),
-      '#weight' => 10 // display after result text
-    );
+  if ($node->type == 'personality_test') {
+    // default view mode, render quiz form
+    if ($view_mode != 'result') {
+      $form = drupal_get_form('personality_test', $node);
+      $node->content['personality_test'] = array(
+        '#markup' => drupal_render($form),
+        '#weight' => 2 // display before form
+      );
+      // add js
+      drupal_add_js(drupal_get_path('module', 'personality_test') .'/scripts/radios_sort.js');
+    }
+    // result view mode, render reset button
+    if ($view_mode == 'result') {
+      $form = drupal_get_form('personality_test_reset_button');
+      $node->content['reset_button'] = array(
+        '#markup' => drupal_render($form),
+        '#weight' => 10 // display after result text
+      );
+    }
   }
-  // $results_field_id = $node->personality_test_results[LANGUAGE_NONE][0]['value'];
-  // $results = entity_load('field_collection_item', array($results_field_id));
-  // dpm($results, 'RESULTS');
-  // dpm($node, 'NODE');
 }
 
 /**
@@ -75,33 +78,24 @@ function personality_test_preprocess_node(&$vars) {
 }
 
 /**
- * Implements hook_preprocess_field() // to hide unwanted results from display
+ * Implements hook_preprocess_field() // hide unwanted results from display
  */
 function personality_test_preprocess_field(&$vars) {
-  // if($vars['element']['#field_name'] == "field_your_fc_field"){
-  //   $fcs = array();
-  //   foreach (element_children($vars['element']) as $key) {
-  //     $fcs[] = array_pop($vars['element'][$key]['entity']['field_collection_item']);
-  //   }
-  //   // now you have all your fcs pulled out of that nasty array
-  //   foreach ($fcs as $fc) {
-  //     # code... that 
-  //   }
- 
-  //   // I would recommend overrideing items markup for whatever black magic you desire
-  //   $vars['items'] = array(
-  //     '#markup' => "Whatever you need to render",
-  //   );  
-  // }
-  // if (isset($vars['element']['#field_name'] = 'personality_test_results') && TRUE == TRUE) {
-
-  // }
-
-  // array_push($vars['classes_array'], 'action');
-
-  // unset($vars['items'][0]['entity']['field_collection_item'][86]['personality_test_result_a']);
-  // TO DO: match results display to score
-  dpm($vars);
+  $cookie = isset($_SESSION['quiz']) ? floatval($_SESSION['quiz']) : -1;
+  if ($vars['element']['#field_name'] == 'personality_test_results') {
+    if (0 <= $cookie && $cookie < floatval(2/3)) {
+      unset($vars['items'][1]);
+      unset($vars['items'][2]);
+    }
+    if (floatval(2/3) <= $cookie && $cookie <= floatval((2/3)*2)) {
+      unset($vars['items'][0]);
+      unset($vars['items'][2]);
+    }
+    if (floatval((2/3)*2) < $cookie && $cookie <= 2) {
+      unset($vars['items'][0]);
+      unset($vars['items'][1]);
+    }
+  }
 }
 
 /**
@@ -124,12 +118,17 @@ function personality_test($form, &$form_state, $node) {
 }
 
 function personality_test_validate($form, &$form_state) {
-  // dpm($form_state, 'FORM STATE');
+  // maybe check if all radios set
 
+  // dpm($form_state, 'FORM STATE');
+  // form_set_error('halt', 'HALT');
+}
+
+function personality_test_submit($form, &$form_state) {
   $results = array();
   if (isset($form_state['values'])) {
     foreach ($form_state['values'] as $field => $value) {
-      if (preg_match('/question/', $field)) {
+      if (preg_match('/question_/', $field)) {
         $value = intval($value);
         $results[$field] = $value;
       }
@@ -138,17 +137,8 @@ function personality_test_validate($form, &$form_state) {
   $number_of_questions = count($results);
   $results_sum = array_sum($results);
   $score = $results_sum / $number_of_questions;
-  dpm($results, 'RESULTS');
-  dpm($number_of_questions, 'NUMBER');
-  dpm($results_sum, 'SUM');
-  dpm($score, 'SCORE');
 
   $_SESSION['quiz'] = $score;
-}
-
-function personality_test_submit($form, &$form_state) {
-
-  
 }
 
 /**
@@ -167,6 +157,15 @@ function personality_test_reset_button_submit($form, &$form_state) {
 }
 
 /**
+ * Implements hook_form_FORM_ID_alter() // adding a description to each results field collection item
+ */
+function personality_test_form_PERSONALITY_TEST_NODE_FORM_alter(&$form, $form_state, $form_id) {
+  $form['personality_test_results'][LANGUAGE_NONE][0]['personality_test_result_heading'][LANGUAGE_NONE][0]['value']['#description'] = t('Result A');
+  $form['personality_test_results'][LANGUAGE_NONE][1]['personality_test_result_heading'][LANGUAGE_NONE][0]['value']['#description'] = t('Result B');
+  $form['personality_test_results'][LANGUAGE_NONE][2]['personality_test_result_heading'][LANGUAGE_NONE][0]['value']['#description'] = t('Result C');
+}
+
+/**
  * Helper function to build form elements from field collection items
  */
 function _personality_test_build_form($items) {
@@ -182,8 +181,17 @@ function _personality_test_build_form($items) {
     $options = _personality_test_options($option_items);
     // put everything together
     $elements['question_'.$index] = array(
+      '#type' => 'container'
+    );
+    $elements['question_'.$index]['markup'] = array(
+      '#type' => 'markup',
+      '#prefix' => '<div class="question-number">',
+      '#suffix' => '</div>',
+      '#markup' => $index
+    );
+    $elements['question_'.$index]['question_'.$index] = array(
       '#type' => 'radios',
-      '#title' => $index . '. ' . $question,
+      '#title' => $question,
       '#options' => $options
     );
   }
@@ -204,5 +212,3 @@ function _personality_test_options($option_items) {
   }
   return $options;
 }
-
-
