@@ -5,7 +5,7 @@
 function personality_test_install() {
   node_types_rebuild();
   $types = node_type_get_types();
-  node_add_body_field($types['personality_test']);
+  // node_add_body_field($types['personality_test']);
   add_custom_fields();
   // Default "Basic page" to not be promoted and have comments disabled.
   variable_set('node_options_personality_test', array('status'));
@@ -57,6 +57,31 @@ function delete_custom_fields() {
 function _personality_test_fields() {
   $t = get_t();
   return array(
+    // Teaser Text
+    array(
+      'field' => array(
+        'field_name' => 'personality_test_body',
+        'label' => $t('Body'),
+        'type' => 'text_long'
+      ),
+      'instance' => array(
+        'field_name' => 'personality_test_body',
+        'entity_type' => 'node',
+        'bundle' => 'personality_test',
+        'label' => $t('Body'),
+        'widget' => array('type' => 'text_textarea'),
+        'display' => array(
+          'default' => array( // view mode
+            'label' => 'hidden',
+            'type' => 'text_default'
+          ),
+          'result' => array( // view mode
+            'label' => 'hidden',
+            'type' => 'text_default'
+          ),
+        )
+      ),
+    ),
     // Image
     array(
       'field' => array(
@@ -77,7 +102,7 @@ function _personality_test_fields() {
           ),
           'result' => array( // view mode
             'label' => 'hidden',
-            'type' => 'hidden'
+            'type' => 'image'
           ),
         )
       ),
@@ -86,14 +111,15 @@ function _personality_test_fields() {
     array(
       'field' => array(
         'field_name' => 'personality_test_results',
-        'label' => $t('Personality Test Results'),
+        'label' => $t('Personality Test Results (A, B and C)'),
+        'cardinality' => 3,
         'type' => 'field_collection'
       ),
       'instance' => array(
         'field_name' => 'personality_test_results',
         'entity_type' => 'node',
         'bundle' => 'personality_test',
-        'label' => $t('Personality Test Results'),
+        'label' => $t('Personality Test Results (A, B and C)'),
         'widget' => array('type' => 'field_collection_embed'), // field_collection_hidden
         'display' => array(
           'default' => array( // view mode, hide on default but display on result
@@ -109,16 +135,16 @@ function _personality_test_fields() {
     ),
     array(
       'field' => array(
-        'field_name' => 'personality_test_result_a',
-        'label' => $t('Result A'),
-        'type' => 'text_long'
+        'field_name' => 'personality_test_result_heading',
+        'label' => $t('Heading'),
+        'type' => 'text'
       ),
       'instance' => array(
-        'field_name' => 'personality_test_result_a',
+        'field_name' => 'personality_test_result_heading',
         'entity_type' => 'field_collection_item',
         'bundle' => 'personality_test_results',
-        'label' => $t('Result A'),
-        'widget' => array('type' => 'text_textarea'),
+        'label' => $t('Heading'),
+        'widget' => array('type' => 'text_textfield'),
         // 'required' => TRUE,
         'display' => array(
           'default' => array(
@@ -130,36 +156,15 @@ function _personality_test_fields() {
     ),
     array(
       'field' => array(
-        'field_name' => 'personality_test_result_b',
-        'label' => $t('Result B'),
+        'field_name' => 'personality_test_result_body',
+        'label' => $t('Body'),
         'type' => 'text_long'
       ),
       'instance' => array(
-        'field_name' => 'personality_test_result_b',
+        'field_name' => 'personality_test_result_body',
         'entity_type' => 'field_collection_item',
         'bundle' => 'personality_test_results',
-        'label' => $t('Result B'),
-        'widget' => array('type' => 'text_textarea'),
-        // 'required' => TRUE,
-        'display' => array(
-          'default' => array(
-            'label' => 'hidden', // hidden, inline, above
-            'type' => 'text_default' // text_default, text_plain, text_trimmed, hidden
-          )
-        )
-      ),
-    ),
-    array(
-      'field' => array(
-        'field_name' => 'personality_test_result_c',
-        'label' => $t('Result C'),
-        'type' => 'text_long'
-      ),
-      'instance' => array(
-        'field_name' => 'personality_test_result_c',
-        'entity_type' => 'field_collection_item',
-        'bundle' => 'personality_test_results',
-        'label' => $t('Result C'),
+        'label' => $t('Body'),
         'widget' => array('type' => 'text_textarea'),
         // 'required' => TRUE,
         'display' => array(
