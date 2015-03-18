@@ -1,8 +1,11 @@
 name = Personality Test
 description = Adds a new content type with custom fields for creating custom personality tests
 core = 7.x
+package = Custom
 dependencies[] = field_collection
 files[] = personality_test.install
 files[] = personality_test.module
 
 ; http://www.sitepoint.com/creating-a-new-drupal-node-type/
+
+;Next thing would be the **results display**. Here I assume I might work with view modes. So after submitting the form a reload is triggered, displaying a results view. Maybe with the help of a session cookie that also stores the reached score? Where would I hook in then to tell the node which view mode it should use?
