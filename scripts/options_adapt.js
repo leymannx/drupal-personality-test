@@ -1,7 +1,11 @@
 (function ($) {
   Drupal.behaviors.PersonalityTestOptionsAdapt = {
     attach: function (context, settings) {
-      console.log('Hallo Welt');
+      $('.field-name-personality-test-answer-map').each(
+        function() {
+          console.log('Hallo Welt');
+        }
+      )
     }
   };
 }) (jQuery);
