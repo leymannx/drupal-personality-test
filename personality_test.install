@@ -145,7 +145,6 @@ function _personality_test_fields() {
         'bundle' => 'personality_test_results',
         'label' => $t('Heading'),
         'widget' => array('type' => 'text_textfield'),
-        // 'required' => TRUE,
         'display' => array(
           'default' => array(
             'label' => 'hidden', // hidden, inline, above
@@ -166,7 +165,7 @@ function _personality_test_fields() {
         'bundle' => 'personality_test_results',
         'label' => $t('Body'),
         'widget' => array('type' => 'text_textarea'),
-        // 'required' => TRUE,
+        'required' => TRUE,
         'display' => array(
           'default' => array(
             'label' => 'hidden', // hidden, inline, above
@@ -213,7 +212,7 @@ function _personality_test_fields() {
         'bundle' => 'personality_test_questions',
         'label' => $t('Question'),
         'widget' => array('type' => 'text_textarea'),
-        // 'required' => TRUE,
+        'required' => TRUE,
         'display' => array(
           'default' => array(
             'label' => 'hidden', // hidden, inline, above
@@ -256,7 +255,7 @@ function _personality_test_fields() {
         'bundle' => 'personality_test_answers',
         'label' => $t('Answer'),
         'widget' => array('type' => 'text_textarea'),
-        // 'required' => TRUE,
+        'required' => TRUE,
         'display' => array(
           'default' => array(
             'label' => 'hidden', // hidden, inline, above
@@ -280,7 +279,7 @@ function _personality_test_fields() {
         'bundle' => 'personality_test_answers',
         'label' => $t('Map to Result A, B or C'),
         'widget' => array('type' => 'options_select'),
-        // 'required' => TRUE,
+        'required' => TRUE,
         'display' => array(
           'default' => array(
             'label' => 'hidden', // hidden, inline, above
