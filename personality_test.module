@@ -1,5 +1,17 @@
 <?php
 /**
+ * @file
+ * Contains functions to create a new content type and to override it henceforth.
+ *
+ * For creation only the first two functions hook_node_info and hook_node_form are needed.
+ * Custom fields are defined and added from personality_test.install file
+ *
+ * The core logic of this module is a multiple choice form.
+ * Once submitted, the result gets calculated and the view mode switches to 'result'
+ * to display prepared answers.
+ */
+
+/**
  * Implements hook_node_info()
  */
 function personality_test_node_info() {
